@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class CoreConfig {
 
     @Bean
-    ExcelExtractor excelExtractor(){
-        return new DefaultExcelExtractor();
+    ExcelExtractor excelExtractor(HeaderProperties headerProperties){
+        return new DefaultExcelExtractor(headerProperties);
     }
 }

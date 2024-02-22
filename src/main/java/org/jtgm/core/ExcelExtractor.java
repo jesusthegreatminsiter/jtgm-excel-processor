@@ -1,5 +1,9 @@
 package org.jtgm.core;
 
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.InputStream;
+
 public interface ExcelExtractor {
-    void extract(String filePath);
+    void extract(MultipartFile file);
 }
