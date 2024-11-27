@@ -12,20 +12,19 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.Year;
 import java.util.*;
 import static org.jtgm.core.dto.CellFinderDTO.buildCellFinder;
 import static org.jtgm.core.dto.FormExcelDTO.buildFormExcel;
 
 
 @RequiredArgsConstructor
-public class DefaultExcelUtil implements ExcelUtil{
+public class DefaultExcelUtil implements ExcelUtil {
 
     private final HeaderProperties headerProperties;
     private static final int HEADER_ROW_NUMBER = 0;
 
     @Override
-    public void generateWorkBook(Sheet sheet, String mgroupName){
+    public void generateWorkBook(Sheet sheet, String mgroupName) {
         try {
             HashMap<String, Integer> headers = getHeaders(sheet);
             List<FormExcelDTO> formExcelList = getInfoFromExcel(sheet, headers);
@@ -37,7 +36,7 @@ public class DefaultExcelUtil implements ExcelUtil{
 
             Sheet sheetRes = resWorkbook.getSheetAt(0);
 
-            for(int j = 0; j < formExcelList.size(); j++){
+            for(int j = 0; j < formExcelList.size(); j++) {
                 FormExcelDTO formExcelDTO = formExcelList.get(j);
                 processRows(mgroupName, resWorkbook, sheetRes, formExcelDTO, formExcelDTO.getAttendees(), false);
                 processRows(mgroupName, resWorkbook, sheetRes, formExcelDTO, formExcelDTO.getOthers(), true);
@@ -56,7 +55,7 @@ public class DefaultExcelUtil implements ExcelUtil{
                              FormExcelDTO formExcelDTO,
                              List<String> toProcess,
                              Boolean isOther) {
-        if(!toProcess.isEmpty()){
+        if(!toProcess.isEmpty()) {
             List<String> attendee = formExcelDTO.getAttendees();
             for(int i = 0; i<attendee.size(); i++ ){
                 Row row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -65,7 +64,6 @@ public class DefaultExcelUtil implements ExcelUtil{
                 CellStyle cellStyle = resWorkbook.createCellStyle();
                 CreationHelper createHelper = resWorkbook.getCreationHelper();
                 cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("mm-dd-yyyy"));
-
 
                 cell0.setCellValue(formExcelDTO.getDate());
                 cell0.setCellStyle(cellStyle);
@@ -76,35 +74,40 @@ public class DefaultExcelUtil implements ExcelUtil{
                 Cell cell2 = row.createCell(2);
                 cell2.setCellValue(formExcelDTO.getMgroupLeader());
 
+                String[] attendeeDet = attendee.get(i).split("-");
+
                 Cell cell3 = row.createCell(3);
-                cell3.setCellValue(attendee.get(i));
+                cell3.setCellValue(Long.valueOf(removeSpaces(attendeeDet[0])));
+
+                Cell cell4 = row.createCell(4);
+                cell4.setCellValue(removeSpaces(attendeeDet[1]));
 
                 if(isOther){
-                    Cell cell4 = row.createCell(4);
-                    cell4.setCellValue("Yes");
+                    Cell cell5 = row.createCell(5);
+                    cell5.setCellValue("Yes");
                 }
 
-                Cell cell5 = row.createCell(5);
-                cell5.setCellValue(computeWeekNumber(formExcelDTO.getDate()));
-
                 Cell cell6 = row.createCell(6);
-                cell6.setCellValue(getMondayOfWeek(formExcelDTO.getDate()));
-                cell6.setCellStyle(cellStyle);
+                cell6.setCellValue(computeWeekNumber(formExcelDTO.getDate()));
 
                 Cell cell7 = row.createCell(7);
-                cell7.setCellValue(LocalDate.now());
+                cell7.setCellValue(getFridayOfWeek(formExcelDTO.getDate()));
                 cell7.setCellStyle(cellStyle);
+
+                Cell cell8 = row.createCell(8);
+                cell8.setCellValue(LocalDate.now());
+                cell8.setCellStyle(cellStyle);
             }
         }
     }
 
-    private int computeWeekNumber(Date date){
+    private int computeWeekNumber(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         return calendar.get(Calendar.WEEK_OF_YEAR);
     }
 
-    private Date getMondayOfWeek(Date date){
+    private Date getFridayOfWeek(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.WEEK_OF_YEAR, computeWeekNumber(date));
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
@@ -113,7 +116,7 @@ public class DefaultExcelUtil implements ExcelUtil{
     }
     private List<FormExcelDTO>  getInfoFromExcel(Sheet sheet, HashMap<String, Integer> headers) {
         List<FormExcelDTO> formExcelDTOList = new ArrayList<>();
-        for(Row row : sheet){
+        for(Row row : sheet) {
             if(row.getRowNum() != HEADER_ROW_NUMBER){
                 CellFinderDTO cellFinder = buildCellFinder(headers, row);
                 formExcelDTOList.add(buildFormExcel(cellFinder, headerProperties));
@@ -122,7 +125,7 @@ public class DefaultExcelUtil implements ExcelUtil{
         return formExcelDTOList;
     }
 
-    private HashMap<String, Integer> getHeaders(Sheet sheet){
+    private HashMap<String, Integer> getHeaders(Sheet sheet) {
         HashMap<String, Integer> headerMap = new HashMap<>();
 
         Row row = sheet.getRow(0);
