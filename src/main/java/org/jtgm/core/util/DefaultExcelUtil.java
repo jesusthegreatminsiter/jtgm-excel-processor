@@ -107,7 +107,7 @@ public class DefaultExcelUtil implements ExcelUtil{
     private Date getMondayOfWeek(Date date){
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.WEEK_OF_YEAR, computeWeekNumber(date));
-        calendar.set(Calendar.YEAR, Year.now().getValue());
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
 
         return calendar.getTime();
     }
