@@ -66,7 +66,7 @@ public class DefaultExcelUtil implements ExcelUtil {
                              List<String> toProcess,
                              Boolean isOther) {
         if(!toProcess.isEmpty()) {
-            List<String> attendee = formExcelDTO.getAttendees();
+            List<String> attendee = toProcess;
             for(int i = 0; i<attendee.size(); i++ ){
                 Row row = sheet.createRow(sheet.getLastRowNum() + 1);
 
@@ -84,17 +84,21 @@ public class DefaultExcelUtil implements ExcelUtil {
                 Cell cell2 = row.createCell(2);
                 cell2.setCellValue(formExcelDTO.getMgroupLeader());
 
-                String[] attendeeDet = attendee.get(i).split("-");
-
-                Cell cell3 = row.createCell(3);
-                cell3.setCellValue(Long.valueOf(removeSpaces(attendeeDet[0])));
+                String[] attendeeDet = attendee.get(i).split(" - ");
 
                 Cell cell4 = row.createCell(4);
-                cell4.setCellValue(removeSpaces(attendeeDet[1]));
 
                 if(isOther){
                     Cell cell5 = row.createCell(5);
                     cell5.setCellValue("Yes");
+
+                    cell4.setCellValue(attendeeDet[0]);
+
+                }else{
+                    Cell cell3 = row.createCell(3);
+                    cell3.setCellValue(Long.valueOf(attendeeDet[0]));
+
+                    cell4.setCellValue(attendeeDet[1]);
                 }
 
                 Cell cell6 = row.createCell(6);
