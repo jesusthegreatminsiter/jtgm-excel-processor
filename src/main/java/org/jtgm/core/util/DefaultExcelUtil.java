@@ -1,52 +1,62 @@
 package org.jtgm.core.util;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jtgm.conf.HeaderProperties;
 import org.jtgm.core.dto.CellFinderDTO;
 import org.jtgm.core.dto.FormExcelDTO;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
+
 import static org.jtgm.core.dto.CellFinderDTO.buildCellFinder;
 import static org.jtgm.core.dto.FormExcelDTO.buildFormExcel;
 
-
 @RequiredArgsConstructor
+@Slf4j
 public class DefaultExcelUtil implements ExcelUtil {
 
     private final HeaderProperties headerProperties;
     private static final int HEADER_ROW_NUMBER = 0;
+    private static final String RESOURCE_NAME = "/file/Transactional.xlsx";
 
     @Override
-    public void generateWorkBook(Sheet sheet, String mgroupName) {
+    public void execute(Sheet sheet, String mgroupName) {
         try {
             HashMap<String, Integer> headers = getHeaders(sheet);
             List<FormExcelDTO> formExcelList = getInfoFromExcel(sheet, headers);
+            String nameDate = new SimpleDateFormat("MM-dd-yyyy").format(getFridayOfWeek(new Date())) + " Staging.xlsx";
+            File outputFile = new File(System.getProperty("user.home") + "/" + nameDate);
 
-            File outputFile = new File(System.getProperty("user.home") + "/Transactional.xlsx");
+            if (!outputFile.exists()) {
+                copyFile(outputFile);
+            }
 
             FileInputStream file = new FileInputStream(outputFile);
             Workbook resWorkbook = new XSSFWorkbook(file);
-
             Sheet sheetRes = resWorkbook.getSheetAt(0);
+
 
             for(int j = 0; j < formExcelList.size(); j++) {
                 FormExcelDTO formExcelDTO = formExcelList.get(j);
                 processRows(mgroupName, resWorkbook, sheetRes, formExcelDTO, formExcelDTO.getAttendees(), false);
                 processRows(mgroupName, resWorkbook, sheetRes, formExcelDTO, formExcelDTO.getOthers(), true);
-
             }
+
             FileOutputStream fos = new FileOutputStream(outputFile);
             resWorkbook.write(fos);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     private void processRows(String mgroupName,
@@ -140,5 +150,10 @@ public class DefaultExcelUtil implements ExcelUtil {
 
     private String removeSpaces(String toFormat){
         return toFormat.replaceAll("\\s", "");
+    }
+
+    public static void copyFile(File out) throws Exception {
+        Path path = FileSystems.getDefault().getPath(out.getPath());
+        Files.copy(DefaultExcelUtil.class.getResourceAsStream(RESOURCE_NAME), path, StandardCopyOption.REPLACE_EXISTING);
     }
 }

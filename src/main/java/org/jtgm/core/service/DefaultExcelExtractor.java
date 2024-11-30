@@ -19,7 +19,7 @@ public class DefaultExcelExtractor implements ExcelExtractor{
             Workbook reqWorkbook = new XSSFWorkbook(file.getInputStream());
             Sheet sheet = reqWorkbook.getSheetAt(0);
 
-            excelUtil.generateWorkBook(sheet, mgroupName);
+            excelUtil.execute(sheet, mgroupName);
         }catch (Exception e) {
             e.printStackTrace();
             throw new GenericErrorException("Error occur", e);
