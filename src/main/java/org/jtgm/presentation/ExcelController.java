@@ -19,8 +19,14 @@ public class ExcelController {
 
     @PostMapping(path = "/mgroup",  produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> saveMgroup(@RequestPart(value="file") MultipartFile file) {
-        log.info("[START] Hitting a test endpoint");
-        excelExtractor.extract(file);
-        return new ResponseEntity<>("Extraction finished", HttpStatus.OK);
+        try{
+            log.info("[START] Hitting a test endpoint");
+            excelExtractor.extract(file);
+            log.info("[END] Hitting a test endpoint");
+            return new ResponseEntity<>("Extraction finished", HttpStatus.OK);
+        }catch (Exception ex){
+            return new ResponseEntity<>("Failed to extract the excel file", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }
