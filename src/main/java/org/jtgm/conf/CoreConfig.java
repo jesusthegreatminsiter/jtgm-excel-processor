@@ -1,9 +1,9 @@
 package org.jtgm.conf;
 
-import org.jtgm.core.service.DefaultExcelExtractor;
+import org.jtgm.core.service.impl.DefaultExcelExtractor;
 import org.jtgm.core.service.ExcelExtractor;
-import org.jtgm.core.util.DefaultExcelUtil;
 import org.jtgm.core.util.ExcelUtil;
+import org.jtgm.core.util.ValidationUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,7 +16,12 @@ public class CoreConfig {
     }
 
     @Bean
-    ExcelUtil excelUtil(HeaderProperties headerProperties){
-        return new DefaultExcelUtil(headerProperties);
+    ExcelUtil excelUtil(ValidationUtil validationUtil, HeaderProperties headerProperties){
+        return new ExcelUtil(validationUtil, headerProperties);
+    }
+
+    @Bean
+    ValidationUtil validationUtil(){
+        return new ValidationUtil();
     }
 }
