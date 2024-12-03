@@ -31,7 +31,7 @@ public class ExcelUtil {
             HashMap<String, Integer> headers = getHeaders(sheet);
             List<FormExcelDTO> formExcelList = getInfoFromExcel(sheet, headers);
             String weekOfYear = new SimpleDateFormat("MM-dd-yyyy").format(getFridayOfWeek(new Date()));
-            String nameDate = System.getProperty("user.home") + "/" + weekOfYear + " Staging.xlsx";
+            String nameDate = System.getProperty("user.home") + "/JTGM MGroup/" + weekOfYear + " Staging.xlsx";
             File outputFile = new File(nameDate);
 
             if (!outputFile.exists()) {
@@ -64,7 +64,6 @@ public class ExcelUtil {
                              Boolean isOther) {
 
         if(!toProcess.isEmpty()) {
-            log.info("[INFO] Data processing...");
             List<String> attendee = toProcess;
             for(int i = 0; i<=attendee.size() - 1; i++ ){
                 String[] attendeeDet = attendee.get(i).split(" - ");

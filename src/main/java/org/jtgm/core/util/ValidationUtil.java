@@ -22,7 +22,6 @@ public class ValidationUtil {
     public boolean validate(String[] personId, int weekNumber, boolean isOthers, String mgroup)  {
         boolean doesExist = false;
         try{
-            log.info("[INFO] Excel validation is starting...");
             RowDTO rowDTO = RowDTO.builder()
                     .fullName(isOthers ? personId[0] : personId[1])
                     .weekNumber(weekNumber)
@@ -52,9 +51,8 @@ public class ValidationUtil {
     }
 
     public List<RowDTO> getListFromExcel() throws Exception {
-        log.info("[INFO] Fetching data from existing excel...");
         String weekOfYear = new SimpleDateFormat("MM-dd-yyyy").format(getFridayOfWeek(new Date()));
-        String nameDate = System.getProperty("user.home") + "/" + weekOfYear + " Staging.xlsx";
+        String nameDate = System.getProperty("user.home") + "/JTGM Mgroup/" + weekOfYear + " Staging.xlsx";
         File outputFile = new File(nameDate);
 
         if (!outputFile.exists()) {
