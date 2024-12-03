@@ -12,4 +12,5 @@ import lombok.Setter;
 public class RowDTO {
     private String fullName;
     private int weekNumber;
+    private String mgroup;
 }

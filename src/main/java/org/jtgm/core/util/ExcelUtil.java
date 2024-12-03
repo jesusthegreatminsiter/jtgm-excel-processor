@@ -31,7 +31,7 @@ public class ExcelUtil {
             HashMap<String, Integer> headers = getHeaders(sheet);
             List<FormExcelDTO> formExcelList = getInfoFromExcel(sheet, headers);
             String weekOfYear = new SimpleDateFormat("MM-dd-yyyy").format(getFridayOfWeek(new Date()));
-            String nameDate = System.getProperty("user.home") + "/" + weekOfYear + " Staging.xlsx";
+            String nameDate = System.getProperty("user.home") + "/JTGM MGroup/" + weekOfYear + " Staging.xlsx";
             File outputFile = new File(nameDate);
 
             if (!outputFile.exists()) {
@@ -41,7 +41,6 @@ public class ExcelUtil {
             FileInputStream file = new FileInputStream(outputFile);
             Workbook resWorkbook = new XSSFWorkbook(file);
             Sheet sheetRes = resWorkbook.getSheetAt(0);
-
 
             for(int j = 0; j < formExcelList.size(); j++) {
                 FormExcelDTO formExcelDTO = formExcelList.get(j);
@@ -53,7 +52,7 @@ public class ExcelUtil {
             resWorkbook.write(fos);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new GenericErrorException("Failed to continue processing file", e);
+            throw new GenericErrorException("[ERROR] Failed to continue processing file", e);
         }
     }
 
@@ -65,12 +64,11 @@ public class ExcelUtil {
                              Boolean isOther) {
 
         if(!toProcess.isEmpty()) {
-            log.info("[INFO] Data processing...");
             List<String> attendee = toProcess;
             for(int i = 0; i<=attendee.size() - 1; i++ ){
                 String[] attendeeDet = attendee.get(i).split(" - ");
                 int weekNumber = computeWeekNumber(formExcelDTO.getDate());
-                boolean doesExist =  validationUtil.validate(attendeeDet, weekNumber, isOther);
+                boolean doesExist =  validationUtil.validate(attendeeDet, weekNumber, isOther, mgroupName);
                 if(doesExist){
                     continue;
                 }
