@@ -8,6 +8,11 @@ import org.jtgm.core.util.ExcelUtil;
 import org.jtgm.core.exception.GenericErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @RequiredArgsConstructor
 public class DefaultExcelExtractor implements ExcelExtractor {
     private final ExcelUtil excelUtil;
@@ -21,6 +26,10 @@ public class DefaultExcelExtractor implements ExcelExtractor {
             Sheet sheet = reqWorkbook.getSheetAt(0);
 
             excelUtil.execute(sheet, mgroupName);
+
+            Files.createDirectories(Paths.get(System.getProperty("user.home") + "/Processed"));
+            String filePath = System.getProperty("user.home") + "/Processed/" + file.getOriginalFilename();
+            file.transferTo(new File(filePath));
         }catch (Exception e) {
             e.printStackTrace();
             throw new GenericErrorException("Unable to process file", e);

@@ -42,7 +42,6 @@ public class ExcelUtil {
             Workbook resWorkbook = new XSSFWorkbook(file);
             Sheet sheetRes = resWorkbook.getSheetAt(0);
 
-
             for(int j = 0; j < formExcelList.size(); j++) {
                 FormExcelDTO formExcelDTO = formExcelList.get(j);
                 processRows(mgroupName, resWorkbook, sheetRes, formExcelDTO, formExcelDTO.getAttendees(), false);
@@ -53,7 +52,7 @@ public class ExcelUtil {
             resWorkbook.write(fos);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new GenericErrorException("Failed to continue processing file", e);
+            throw new GenericErrorException("[ERROR] Failed to continue processing file", e);
         }
     }
 
@@ -70,7 +69,7 @@ public class ExcelUtil {
             for(int i = 0; i<=attendee.size() - 1; i++ ){
                 String[] attendeeDet = attendee.get(i).split(" - ");
                 int weekNumber = computeWeekNumber(formExcelDTO.getDate());
-                boolean doesExist =  validationUtil.validate(attendeeDet, weekNumber, isOther);
+                boolean doesExist =  validationUtil.validate(attendeeDet, weekNumber, isOther, mgroupName);
                 if(doesExist){
                     continue;
                 }

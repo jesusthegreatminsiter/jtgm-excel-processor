@@ -19,13 +19,14 @@ import static org.jtgm.core.util.GenericUtil.getFridayOfWeek;
 @Slf4j
 public class ValidationUtil {
 
-    public boolean validate(String[] personId, int weekNumber, boolean isOthers)  {
+    public boolean validate(String[] personId, int weekNumber, boolean isOthers, String mgroup)  {
         boolean doesExist = false;
         try{
             log.info("[INFO] Excel validation is starting...");
             RowDTO rowDTO = RowDTO.builder()
                     .fullName(isOthers ? personId[0] : personId[1])
                     .weekNumber(weekNumber)
+                    .mgroup(mgroup)
                     .build();
 
             List<RowDTO> listFromExcel = getListFromExcel();
@@ -35,8 +36,10 @@ public class ValidationUtil {
                     RowDTO rowData = listFromExcel.get(x);
                     if(rowData.getFullName().equalsIgnoreCase(rowDTO.getFullName())) {
                         if(rowData.getWeekNumber() == rowDTO.getWeekNumber()){
-                            doesExist = true;
-                            break;
+                            if(rowData.getMgroup().equalsIgnoreCase(rowDTO.getMgroup())) {
+                                doesExist = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -71,6 +74,7 @@ public class ValidationUtil {
                 rowDTOList.add(RowDTO.builder()
                         .fullName(row.getCell(4).getStringCellValue())
                         .weekNumber((int) row.getCell(6).getNumericCellValue())
+                        .mgroup(row.getCell(1).getStringCellValue())
                         .build());
             }
         }
