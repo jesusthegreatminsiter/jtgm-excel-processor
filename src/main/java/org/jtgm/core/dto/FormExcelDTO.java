@@ -31,7 +31,8 @@ public class FormExcelDTO {
         String cell = getStringValue(cellFinder, headerProperties);
         List<String> finArr = new ArrayList<>();
         if(cell != null) {
-            String[] tempArr = cell.split(";");
+            String cell2 = cell.replace("\u00a0"," ");
+            String[] tempArr = cell2.split(";");
             for (String s : tempArr) {
                 if (s != null && !s.isEmpty() && s != "null" && s != "") {
                     finArr.add(s);
