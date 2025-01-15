@@ -2,6 +2,7 @@ package org.jtgm.presentation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.jtgm.core.service.ExcelExtractor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,8 +27,11 @@ public class ExcelController {
 
             for (File file : listOfFiles) {
                 if (file.isFile()) {
-                    log.info("[INFO] File Name {}", file.getName());
-                    excelExtractor.extract(file);
+                    if(FilenameUtils.isExtension(file.getName(),"xls")
+                            || FilenameUtils.isExtension(file.getName(),"xlsx")) {
+                        log.info("[INFO] File Name {}", file.getName());
+                        excelExtractor.extract(file);
+                    }
                 }
             }
 
