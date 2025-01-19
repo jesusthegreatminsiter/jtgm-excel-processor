@@ -16,6 +16,8 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 @RequiredArgsConstructor
 @Slf4j
 public class DefaultExcelExtractor implements ExcelExtractor {
@@ -31,9 +33,9 @@ public class DefaultExcelExtractor implements ExcelExtractor {
             Sheet sheet = reqWorkbook.getSheetAt(0);
 
             excelUtil.execute(sheet, mgroupName);
+            file.close();
             moveFilesToDirectory(fileRaw);
         }catch (Exception e) {
-            e.printStackTrace();
             throw new GenericErrorException("Unable to process file", e);
         }
     }
@@ -43,13 +45,13 @@ public class DefaultExcelExtractor implements ExcelExtractor {
             Files.createDirectories(Paths.get(System.getProperty("user.home") + "/JTGM MGroup/Processed"));
             File newFile = new File(System.getProperty("user.home") + "/JTGM MGroup/Processed/" + fileRaw.getName());
             File oldFile = new File(fileRaw.getPath());
-            File toDelete = oldFile;
-            oldFile.renameTo(newFile);
-            toDelete.delete();
+
+            log.info("[INFO] Moving files from Raw folder to processed.");
+            Files.move(oldFile.toPath(), newFile.toPath(), REPLACE_EXISTING);
         }catch (FileAlreadyExistsException ex){
             log.error("[ERROR] File already exist, will not transfer.");
         }catch (IOException ex){
-            ex.printStackTrace();
+            throw new GenericErrorException("Unable to process file", ex);
         }
     }
 
