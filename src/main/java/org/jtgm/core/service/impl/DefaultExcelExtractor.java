@@ -33,6 +33,7 @@ public class DefaultExcelExtractor implements ExcelExtractor {
             Sheet sheet = reqWorkbook.getSheetAt(0);
 
             excelUtil.execute(sheet, mgroupName);
+            file.close();
             moveFilesToDirectory(fileRaw);
         }catch (Exception e) {
             throw new GenericErrorException("Unable to process file", e);
