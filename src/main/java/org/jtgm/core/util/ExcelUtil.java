@@ -50,6 +50,8 @@ public class ExcelUtil {
 
             FileOutputStream fos = new FileOutputStream(outputFile);
             resWorkbook.write(fos);
+            fos.close();
+            resWorkbook.close();
         } catch (Exception e) {
             e.printStackTrace();
             throw new GenericErrorException("[ERROR] Failed to continue processing file", e);

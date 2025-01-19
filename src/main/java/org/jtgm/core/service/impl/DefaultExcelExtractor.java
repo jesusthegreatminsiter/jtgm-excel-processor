@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -36,7 +35,6 @@ public class DefaultExcelExtractor implements ExcelExtractor {
             excelUtil.execute(sheet, mgroupName);
             moveFilesToDirectory(fileRaw);
         }catch (Exception e) {
-            e.printStackTrace();
             throw new GenericErrorException("Unable to process file", e);
         }
     }
@@ -52,7 +50,7 @@ public class DefaultExcelExtractor implements ExcelExtractor {
         }catch (FileAlreadyExistsException ex){
             log.error("[ERROR] File already exist, will not transfer.");
         }catch (IOException ex){
-            ex.printStackTrace();
+            throw new GenericErrorException("Unable to process file", ex);
         }
     }
 
