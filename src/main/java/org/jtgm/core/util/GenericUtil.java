@@ -27,7 +27,10 @@ public class GenericUtil {
     }
 
     public static Date getFridayOfWeek(Date date) {
+
+
         Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
         calendar.set(Calendar.WEEK_OF_YEAR, computeWeekNumber(date));
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
 

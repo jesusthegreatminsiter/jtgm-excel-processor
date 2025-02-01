@@ -9,12 +9,10 @@ import org.jtgm.core.dto.RowDTO;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 
-import static org.jtgm.core.util.GenericUtil.getFridayOfWeek;
 
 @Slf4j
 public class ValidationUtil {
@@ -51,8 +49,8 @@ public class ValidationUtil {
     }
 
     public List<RowDTO> getListFromExcel() throws Exception {
-        String weekOfYear = new SimpleDateFormat("MM-dd-yyyy").format(getFridayOfWeek(new Date()));
-        String nameDate = System.getProperty("user.home") + "/JTGM Mgroup/" + weekOfYear + " Staging.xlsx";
+        String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+        String nameDate = System.getProperty("user.home") + "/JTGM MGroup/" + year  + " Report.xlsx";
         File outputFile = new File(nameDate);
 
         if (!outputFile.exists()) {

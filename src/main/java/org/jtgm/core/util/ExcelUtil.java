@@ -10,7 +10,6 @@ import org.jtgm.core.dto.FormExcelDTO;
 import org.jtgm.core.exception.GenericErrorException;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -30,8 +29,8 @@ public class ExcelUtil {
         try {
             HashMap<String, Integer> headers = getHeaders(sheet);
             List<FormExcelDTO> formExcelList = getInfoFromExcel(sheet, headers);
-            String weekOfYear = new SimpleDateFormat("MM-dd-yyyy").format(getFridayOfWeek(new Date()));
-            String nameDate = System.getProperty("user.home") + "/JTGM MGroup/" + weekOfYear + " Staging.xlsx";
+            String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+            String nameDate = System.getProperty("user.home") + "/JTGM MGroup/" + year  + " Report.xlsx";
             File outputFile = new File(nameDate);
 
             if (!outputFile.exists()) {
@@ -66,11 +65,11 @@ public class ExcelUtil {
                              Boolean isOther) {
 
         if(!toProcess.isEmpty()) {
-            List<String> attendee = toProcess;
-            for(int i = 0; i<=attendee.size() - 1; i++ ){
-                String[] attendeeDet = attendee.get(i).split(" - ");
+            for(int i = 0; i <= toProcess.size() - 1; i++ ){
+                String[] attendeeDet = toProcess.get(i).split(" - ");
                 int weekNumber = computeWeekNumber(formExcelDTO.getDate());
                 boolean doesExist =  validationUtil.validate(attendeeDet, weekNumber, isOther, mgroupName);
+
                 if(doesExist){
                     continue;
                 }
@@ -97,8 +96,44 @@ public class ExcelUtil {
                     Cell cell5 = row.createCell(5);
                     cell5.setCellValue("Yes");
 
-                    cell4.setCellValue(attendeeDet[0]);
+                    String[] newAttendee = attendeeDet[0].split("\\r?\\n");
+                    newAttendee = Arrays.stream(newAttendee).filter(Objects::nonNull)
+                            .filter(s -> !Objects.equals(s, ""))
+                            .toArray(String[]::new);
+                    cell4.setCellValue(newAttendee[0]);
 
+                    if(newAttendee.length > 1) {
+                        for (int y = 1; y <= newAttendee.length - 1; y++) {
+                            Row row_ = sheet.createRow(sheet.getLastRowNum() + 1);
+
+                            Cell cell01 = row_.createCell(0);
+                            cell01.setCellValue(formExcelDTO.getDate());
+                            cell01.setCellStyle(cellStyle);
+
+                            Cell cell1_ = row_.createCell(1);
+                            cell1_.setCellValue(mgroupName);
+
+                            Cell cell2_ = row_.createCell(2);
+                            cell2_.setCellValue(formExcelDTO.getMgroupLeader());
+
+                            Cell cell4_ = row_.createCell(4);
+                            cell4_.setCellValue(newAttendee[y]);
+
+                            Cell cell6_ = row_.createCell(6);
+                            cell6_.setCellValue(weekNumber);
+
+                            Cell cell7_ = row_.createCell(7);
+                            cell7_.setCellValue(getFridayOfWeek(formExcelDTO.getDate()));
+                            cell7_.setCellStyle(cellStyle);
+
+                            Cell cell8_ = row_.createCell(8);
+                            cell8_.setCellValue(LocalDate.now());
+                            cell8_.setCellStyle(cellStyle);
+                            Cell cell5_ = row_.createCell(5);
+                            cell5_.setCellValue("Yes");
+                        }
+
+                    }
                 }else{
                     Cell cell3 = row.createCell(3);
                     cell3.setCellValue(Long.valueOf(attendeeDet[0]));
