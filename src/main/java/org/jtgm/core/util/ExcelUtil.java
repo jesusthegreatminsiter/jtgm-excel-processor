@@ -10,7 +10,6 @@ import org.jtgm.core.dto.FormExcelDTO;
 import org.jtgm.core.exception.GenericErrorException;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -30,18 +29,24 @@ public class ExcelUtil {
         try {
             HashMap<String, Integer> headers = getHeaders(sheet);
             List<FormExcelDTO> formExcelList = getInfoFromExcel(sheet, headers);
+            String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+            String nameDate = System.getProperty("user.home") + "/JTGM MGroup/" + year  + " Report.xlsx";
+            File outputFile = new File(nameDate);
 
-            File outputFile = generateOutputFile(new Date());
+            if (!outputFile.exists()) {
+                copyFile(outputFile);
+            }
+
             FileInputStream file = new FileInputStream(outputFile);
             Workbook resWorkbook = new XSSFWorkbook(file);
             Sheet sheetRes = resWorkbook.getSheetAt(0);
 
             for(int j = 0; j < formExcelList.size(); j++) {
                 FormExcelDTO formExcelDTO = formExcelList.get(j);
-                String path = outputFile.getPath();
-                processRows(mgroupName, resWorkbook, sheetRes, formExcelDTO, formExcelDTO.getAttendees(), false, path);
-                processRows(mgroupName, resWorkbook, sheetRes, formExcelDTO, formExcelDTO.getOthers(), true, path);
+                processRows(mgroupName, resWorkbook, sheetRes, formExcelDTO, formExcelDTO.getAttendees(), false);
+                processRows(mgroupName, resWorkbook, sheetRes, formExcelDTO, formExcelDTO.getOthers(), true);
             }
+
             FileOutputStream fos = new FileOutputStream(outputFile);
             resWorkbook.write(fos);
             fos.close();
@@ -52,112 +57,102 @@ public class ExcelUtil {
         }
     }
 
-    private static File generateOutputFile(Date date) {
-        try{
-            String weekOfYear = new SimpleDateFormat("MM-dd-yyyy").format(getFridayOfWeek(date));
-            String nameDate = System.getProperty("user.home") + "/JTGM MGroup/" + weekOfYear + " Staging.xlsx";
-            File outputFile = new File(nameDate);
-
-            if (!outputFile.exists()) {
-                copyFile(outputFile);
-            }
-
-            return outputFile;
-        }catch(Exception e ){
-            throw new GenericErrorException("[ERROR] Failed to generate output file", e);
-        }
-    }
-
     private void processRows(String mgroupName,
                              Workbook resWorkbook,
                              Sheet sheet,
                              FormExcelDTO formExcelDTO,
                              List<String> toProcess,
-                             Boolean isOther,
-                             String fileName) {
-        try {
-            int thisWeekNum = computeWeekNumber(new Date());
-            if(!toProcess.isEmpty()) {
-                for(int i = 0; i<= toProcess.size() - 1; i++ ){
-                    String[] attendeeDet = toProcess.get(i).split(" - ");
-                    int weekNumber = computeWeekNumber(formExcelDTO.getDate());
+                             Boolean isOther) {
 
-                    Row row;
-                    CellStyle cellStyle;
-                    File outputFile = null;
-                    Workbook extraWorkbook = null;
-                    CreationHelper createHelper;
+        if(!toProcess.isEmpty()) {
+            for(int i = 0; i <= toProcess.size() - 1; i++ ){
+                String[] attendeeDet = toProcess.get(i).split(" - ");
+                int weekNumber = computeWeekNumber(formExcelDTO.getDate());
+                boolean doesExist =  validationUtil.validate(attendeeDet, weekNumber, isOther, mgroupName);
 
-                    if (thisWeekNum != weekNumber){
-                        outputFile = generateOutputFile(formExcelDTO.getDate());
-                        FileInputStream file = new FileInputStream(outputFile);
-                        extraWorkbook = new XSSFWorkbook(file);
-                        Sheet sheetRes = extraWorkbook.getSheetAt(0);
-
-                        fileName = outputFile.getPath();
-                        row = sheetRes.createRow(sheetRes.getLastRowNum() + 1);
-                        cellStyle = extraWorkbook.createCellStyle();
-                        createHelper = extraWorkbook.getCreationHelper();
-                    }else{
-                        row = sheet.createRow(sheet.getLastRowNum() + 1);
-                        cellStyle = resWorkbook.createCellStyle();
-                        createHelper = resWorkbook.getCreationHelper();
-                    }
-                    boolean doesExist =  validationUtil.validate(attendeeDet, weekNumber, isOther, mgroupName, fileName);
-                    if(doesExist){
-                        continue;
-                    }
-
-                    Cell cell0 = row.createCell(0);
-
-
-                    cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("mm-dd-yyyy"));
-
-                    cell0.setCellValue(formExcelDTO.getDate());
-                    cell0.setCellStyle(cellStyle);
-
-                    Cell cell1 = row.createCell(1);
-                    cell1.setCellValue(mgroupName);
-
-                    Cell cell2 = row.createCell(2);
-                    cell2.setCellValue(formExcelDTO.getMgroupLeader());
-
-                    Cell cell4 = row.createCell(4);
-
-                    if(isOther){
-                        Cell cell5 = row.createCell(5);
-                        cell5.setCellValue("Yes");
-
-                        cell4.setCellValue(attendeeDet[0]);
-
-                    }else{
-                        Cell cell3 = row.createCell(3);
-                        cell3.setCellValue(Long.parseLong(attendeeDet[0]));
-
-                        cell4.setCellValue(attendeeDet[1]);
-                    }
-
-                    Cell cell6 = row.createCell(6);
-                    cell6.setCellValue(weekNumber);
-
-                    Cell cell7 = row.createCell(7);
-                    cell7.setCellValue(getFridayOfWeek(formExcelDTO.getDate()));
-                    cell7.setCellStyle(cellStyle);
-
-                    Cell cell8 = row.createCell(8);
-                    cell8.setCellValue(LocalDate.now());
-                    cell8.setCellStyle(cellStyle);
-
-                    if(outputFile!=null){
-                        FileOutputStream fos = new FileOutputStream(outputFile);
-                        extraWorkbook.write(fos);
-                        fos.close();
-                        extraWorkbook.close();
-                    }
+                if(doesExist){
+                    continue;
                 }
+
+                Row row = sheet.createRow(sheet.getLastRowNum() + 1);
+
+                Cell cell0 = row.createCell(0);
+                CellStyle cellStyle = resWorkbook.createCellStyle();
+                CreationHelper createHelper = resWorkbook.getCreationHelper();
+                cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("mm-dd-yyyy"));
+
+                cell0.setCellValue(formExcelDTO.getDate());
+                cell0.setCellStyle(cellStyle);
+
+                Cell cell1 = row.createCell(1);
+                cell1.setCellValue(mgroupName);
+
+                Cell cell2 = row.createCell(2);
+                cell2.setCellValue(formExcelDTO.getMgroupLeader());
+
+                Cell cell4 = row.createCell(4);
+
+                if(isOther){
+                    Cell cell5 = row.createCell(5);
+                    cell5.setCellValue("Yes");
+
+                    String[] newAttendee = attendeeDet[0].split("\\r?\\n");
+                    newAttendee = Arrays.stream(newAttendee).filter(Objects::nonNull)
+                            .filter(s -> !Objects.equals(s, ""))
+                            .toArray(String[]::new);
+                    cell4.setCellValue(newAttendee[0]);
+
+                    if(newAttendee.length > 1) {
+                        for (int y = 1; y <= newAttendee.length - 1; y++) {
+                            Row row_ = sheet.createRow(sheet.getLastRowNum() + 1);
+
+                            Cell cell01 = row_.createCell(0);
+                            cell01.setCellValue(formExcelDTO.getDate());
+                            cell01.setCellStyle(cellStyle);
+
+                            Cell cell1_ = row_.createCell(1);
+                            cell1_.setCellValue(mgroupName);
+
+                            Cell cell2_ = row_.createCell(2);
+                            cell2_.setCellValue(formExcelDTO.getMgroupLeader());
+
+                            Cell cell4_ = row_.createCell(4);
+                            cell4_.setCellValue(newAttendee[y]);
+
+                            Cell cell6_ = row_.createCell(6);
+                            cell6_.setCellValue(weekNumber);
+
+                            Cell cell7_ = row_.createCell(7);
+                            cell7_.setCellValue(getFridayOfWeek(formExcelDTO.getDate()));
+                            cell7_.setCellStyle(cellStyle);
+
+                            Cell cell8_ = row_.createCell(8);
+                            cell8_.setCellValue(LocalDate.now());
+                            cell8_.setCellStyle(cellStyle);
+                            Cell cell5_ = row_.createCell(5);
+                            cell5_.setCellValue("Yes");
+                        }
+
+                    }
+                }else{
+                    Cell cell3 = row.createCell(3);
+                    cell3.setCellValue(Long.valueOf(attendeeDet[0]));
+
+                    cell4.setCellValue(attendeeDet[1]);
+                }
+
+                Cell cell6 = row.createCell(6);
+
+                cell6.setCellValue(weekNumber);
+
+                Cell cell7 = row.createCell(7);
+                cell7.setCellValue(getFridayOfWeek(formExcelDTO.getDate()));
+                cell7.setCellStyle(cellStyle);
+
+                Cell cell8 = row.createCell(8);
+                cell8.setCellValue(LocalDate.now());
+                cell8.setCellStyle(cellStyle);
             }
-        } catch (Exception e) {
-            throw new GenericErrorException("[ERROR] Failed to process file", e);
         }
     }
 

@@ -9,17 +9,15 @@ import org.jtgm.core.dto.RowDTO;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 
-import static org.jtgm.core.util.GenericUtil.getFridayOfWeek;
 
 @Slf4j
 public class ValidationUtil {
 
-    public boolean validate(String[] personId, int weekNumber, boolean isOthers, String mgroup, String fileName)  {
+    public boolean validate(String[] personId, int weekNumber, boolean isOthers, String mgroup)  {
         boolean doesExist = false;
         try{
             RowDTO rowDTO = RowDTO.builder()
@@ -28,7 +26,7 @@ public class ValidationUtil {
                     .mgroup(mgroup)
                     .build();
 
-            List<RowDTO> listFromExcel = getListFromExcel(fileName);
+            List<RowDTO> listFromExcel = getListFromExcel();
             int size = listFromExcel.size();
             if (size != 0) {
                 for(int x = 0; x <= size - 1; x++){
@@ -50,8 +48,10 @@ public class ValidationUtil {
         }
     }
 
-    public List<RowDTO> getListFromExcel(String fileName) throws Exception {
-        File outputFile = new File(fileName);
+    public List<RowDTO> getListFromExcel() throws Exception {
+        String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+        String nameDate = System.getProperty("user.home") + "/JTGM MGroup/" + year  + " Report.xlsx";
+        File outputFile = new File(nameDate);
 
         if (!outputFile.exists()) {
             return  null;
