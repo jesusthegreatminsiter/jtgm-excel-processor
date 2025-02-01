@@ -30,6 +30,8 @@ public class GenericUtil {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.WEEK_OF_YEAR, computeWeekNumber(date));
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
 
         return calendar.getTime();
     }
