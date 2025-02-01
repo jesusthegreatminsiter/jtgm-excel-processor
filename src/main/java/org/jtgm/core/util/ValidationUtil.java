@@ -19,7 +19,7 @@ import static org.jtgm.core.util.GenericUtil.getFridayOfWeek;
 @Slf4j
 public class ValidationUtil {
 
-    public boolean validate(String[] personId, int weekNumber, boolean isOthers, String mgroup)  {
+    public boolean validate(String[] personId, int weekNumber, boolean isOthers, String mgroup, String fileName)  {
         boolean doesExist = false;
         try{
             RowDTO rowDTO = RowDTO.builder()
@@ -28,7 +28,7 @@ public class ValidationUtil {
                     .mgroup(mgroup)
                     .build();
 
-            List<RowDTO> listFromExcel = getListFromExcel();
+            List<RowDTO> listFromExcel = getListFromExcel(fileName);
             int size = listFromExcel.size();
             if (size != 0) {
                 for(int x = 0; x <= size - 1; x++){
@@ -50,10 +50,8 @@ public class ValidationUtil {
         }
     }
 
-    public List<RowDTO> getListFromExcel() throws Exception {
-        String weekOfYear = new SimpleDateFormat("MM-dd-yyyy").format(getFridayOfWeek(new Date()));
-        String nameDate = System.getProperty("user.home") + "/JTGM Mgroup/" + weekOfYear + " Staging.xlsx";
-        File outputFile = new File(nameDate);
+    public List<RowDTO> getListFromExcel(String fileName) throws Exception {
+        File outputFile = new File(fileName);
 
         if (!outputFile.exists()) {
             return  null;

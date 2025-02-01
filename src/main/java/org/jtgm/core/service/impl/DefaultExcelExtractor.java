@@ -26,14 +26,14 @@ public class DefaultExcelExtractor implements ExcelExtractor {
     @Override
     public void extract(File fileRaw) {
         try {
-            InputStream file = new FileInputStream(fileRaw);
+            InputStream fileToProcess = new FileInputStream(fileRaw);
             String mgroupName = getMgroupName(fileRaw);
 
-            Workbook reqWorkbook = new XSSFWorkbook(file);
+            Workbook reqWorkbook = new XSSFWorkbook(fileToProcess);
             Sheet sheet = reqWorkbook.getSheetAt(0);
 
             excelUtil.execute(sheet, mgroupName);
-            file.close();
+            fileToProcess.close();
             moveFilesToDirectory(fileRaw);
         }catch (Exception e) {
             throw new GenericErrorException("Unable to process file", e);
