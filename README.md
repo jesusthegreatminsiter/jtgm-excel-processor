@@ -23,3 +23,11 @@ After create a folder in home directory `/JTGM MGroup/Raw` as it is stated the f
   curl -XGET 'http://localhost:8080/jtgm/excel/mgroup'
 ```
 
+
+## How to build executable jar
+
+```
+  mvn clean compile assembly:single
+```
+
+
