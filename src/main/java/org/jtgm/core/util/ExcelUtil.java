@@ -135,10 +135,14 @@ public class ExcelUtil {
 
                     }
                 }else{
-                    Cell cell3 = row.createCell(3);
-                    cell3.setCellValue(Long.valueOf(attendeeDet[0]));
+                    if(attendeeDet.length > 1) {
+                        Cell cell3 = row.createCell(3);
+                        cell3.setCellValue(Long.valueOf(attendeeDet[0]));
 
-                    cell4.setCellValue(attendeeDet[1]);
+                        cell4.setCellValue(attendeeDet[1]);
+                    }else{
+                        cell4.setCellValue(attendeeDet[0]);
+                    }
                 }
 
                 Cell cell6 = row.createCell(6);

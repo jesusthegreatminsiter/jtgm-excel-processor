@@ -20,8 +20,7 @@ public class ValidationUtil {
     public boolean validate(String[] personId, int weekNumber, boolean isOthers, String mgroup)  {
         boolean doesExist = false;
         try{
-            String name = isOthers && personId.length > 1 ? personId[0] : personId[1];
-            log.info(String.valueOf(personId.length));
+            String name = isOthers || personId.length < 2 ? personId[0] : personId[1];
             RowDTO rowDTO = RowDTO.builder()
                     .fullName(name)
                     .weekNumber(weekNumber)
