@@ -2,6 +2,7 @@ package org.jtgm.core.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jtgm.core.service.ExcelExtractor;
@@ -26,6 +27,7 @@ public class DefaultExcelExtractor implements ExcelExtractor {
     @Override
     public void extract(File fileRaw) {
         try {
+            ZipSecureFile.setMinInflateRatio(0);
             InputStream fileToProcess = new FileInputStream(fileRaw);
             Workbook reqWorkbook = new XSSFWorkbook(fileToProcess);
             fileToProcess.close();
