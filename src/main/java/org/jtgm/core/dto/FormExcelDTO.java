@@ -4,6 +4,7 @@ import lombok.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.jtgm.conf.HeaderProperties;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +18,7 @@ public class FormExcelDTO {
     private String mgroupLeader;
     private Date date;
     private List<String> others;
+    private String time;
 
     public static FormExcelDTO buildFormExcel(CellFinderDTO cellFinder, HeaderProperties headerProperties) {
         return builder()
@@ -24,6 +26,7 @@ public class FormExcelDTO {
                 .mgroupLeader(getStringValue(cellFinder, headerProperties.getLeader()))
                 .date(getDateValue(cellFinder, headerProperties.getDate()))
                 .others(getList(cellFinder, headerProperties.getOtherAttendee()))
+                .time(getStringValue(cellFinder, headerProperties.getTime()))
                 .build();
     }
 

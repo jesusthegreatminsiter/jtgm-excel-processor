@@ -16,4 +16,5 @@ public class HeaderProperties {
     private String leader;
     private String date;
     private String otherAttendee;
+    private String time;
 }

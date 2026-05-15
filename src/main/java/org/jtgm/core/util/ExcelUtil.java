@@ -156,6 +156,11 @@ public class ExcelUtil {
                 Cell cell8 = row.createCell(8);
                 cell8.setCellValue(LocalDate.now());
                 cell8.setCellStyle(cellStyle);
+
+                Cell cell9 = row.createCell(9);
+                cell9.setCellValue(formExcelDTO.getTime());
+                cell9.setCellStyle(cellStyle);
+                log.info(formExcelDTO.getTime());
             }
         }
     }
