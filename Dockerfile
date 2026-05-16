@@ -5,7 +5,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN mvn clean package -DskipTests
+RUN mvn clean package
 
 # Run stage
 FROM eclipse-temurin:26-jre
